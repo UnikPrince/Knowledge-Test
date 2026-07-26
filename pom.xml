@@ -5,77 +5,58 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.interview.simulator</groupId>
-    <artifactId>ai-interview-simulator</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.0</version>
+        <relativePath/>
+    </parent>
 
+    <groupId>com.interview</groupId>
+    <artifactId>ai-interview-simulator</artifactId>
+    <version>1.0.0</version>
     <name>AI Interview Simulator</name>
-    <description>Production-ready AI-powered interview simulator using Google ADK and Java</description>
+    <description>Production-ready AI-powered interview simulator using Google Agent Development Kit</description>
 
     <properties>
+        <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
-        <!-- Framework & AI Dependencies -->
-        <google.generativeai.version>0.3.0</google.generativeai.version>
-        <spring-boot.version>3.2.0</spring-boot.version>
-        <spring-ai.version>0.8.1</spring-ai.version>
-        
-        <!-- PDF Processing -->
-        <pdfbox.version>3.0.0</pdfbox.version>
-        <itext.version>8.0.0</itext.version>
-        
-        <!-- Vector Database & Embedding -->
-        <pgvector.version>0.1.1</pgvector.version>
-        <postgresql.version>42.7.1</postgresql.version>
-        
-        <!-- Logging & Utilities -->
-        <slf4j.version>2.0.9</slf4j.version>
-        <logback.version>1.4.14</logback.version>
-        <lombok.version>1.18.30</lombok.version>
-        
-        <!-- Testing -->
-        <junit.version>5.10.0</junit.version>
-        <mockito.version>5.5.1</mockito.version>
-        
-        <!-- Configuration -->
-        <dotenv.version>2.3.2</dotenv.version>
+        <google-generativeai.version>0.4.0</google-generativeai.version>
+        <pdfbox.version>3.0.1</pdfbox.version>
+        <dotenv.version>6.3.0</dotenv.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
-        <!-- Google Generative AI -->
-        <dependency>
-            <groupId>com.google.ai.client.generativeai</groupId>
-            <artifactId>google-generativeai</artifactId>
-            <version>${google.generativeai.version}</version>
-        </dependency>
-
-        <!-- Spring Boot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
+        <!-- Spring Boot Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Database -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Google AI -->
+        <dependency>
+            <groupId>com.google.ai.client.generativeai</groupId>
+            <artifactId>google-generativeai</artifactId>
+            <version>${google-generativeai.version}</version>
         </dependency>
 
         <!-- PDF Processing -->
@@ -85,36 +66,18 @@
             <version>${pdfbox.version}</version>
         </dependency>
 
-        <!-- Database -->
+        <!-- Environment Variables -->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.pgvector</groupId>
-            <artifactId>pgvector</artifactId>
-            <version>${pgvector.version}</version>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>${dotenv.version}</version>
         </dependency>
 
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
-        </dependency>
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Configuration -->
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>${dotenv.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Testing -->
@@ -123,16 +86,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -142,7 +99,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
                 <configuration>
                     <excludes>
                         <exclude>
@@ -152,6 +108,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -1,313 +1,479 @@
 # AI Interview Simulator
 
-A production-ready AI-powered interview simulator built with **Google Agent Development Kit (ADK)**, **Java 21**, and **Spring Boot 3**. This application simulates realistic technical interviews and provides comprehensive performance evaluations.
+## Overview
 
-## 🎯 Project Overview
-
-The AI Interview Simulator is designed for technical students preparing for software engineering interviews. It processes technical study materials, creates a knowledge base using RAG (Retrieval-Augmented Generation), and conducts intelligent interviews with adaptive difficulty levels.
+Production-ready AI-powered interview simulator using **Google Agent Development Kit (ADK)** with Java and Spring Boot. This application provides intelligent interview experiences with adaptive difficulty, semantic search through knowledge bases, and comprehensive performance analysis.
 
 ### Key Features
 
-- **📄 PDF Processing**: Upload and extract technical content from PDFs
-- **🔍 RAG Pipeline**: Semantic search with vector embeddings for accurate context retrieval
-- **🤖 AI Interview Agent**: Realistic technical interviewer powered by Google Gemini
-- **📊 Performance Evaluation**: Detailed reports with scores, feedback, and study recommendations
-- **🔌 Modular Architecture**: Clean separation of concerns following SOLID principles
-- **🚀 Future-Ready**: Voice interaction and multiple interview modes easily extensible
+- 🤖 **AI Interview Agent**: Google Gemini-powered intelligent interviewer
+- 📄 **PDF Processing**: Extract and parse interview materials automatically
+- 🔍 **RAG Pipeline**: Semantic search with vector embeddings for contextual questions
+- 📊 **Performance Evaluation**: Comprehensive interview analysis and reporting
+- 🎯 **Adaptive Difficulty**: Real-time difficulty adjustment based on responses
+- 📱 **REST API**: Fully documented REST endpoints for frontend integration
+- 🔐 **Enterprise Ready**: Spring Security, transaction management, error handling
 
-## 🛠️ Tech Stack
+## Architecture
 
-| Component | Technology |
-|-----------|-----------|
-| **Language** | Java 21 (LTS) |
-| **Framework** | Spring Boot 3.2 |
-| **AI/LLM** | Google Generative AI (Gemini) |
-| **Vector DB** | PostgreSQL + pgvector |
-| **PDF Processing** | Apache PDFBox 3.0 |
-| **Build Tool** | Maven 3.9+ |
-
-## 📋 Requirements
-
-- Java 21 or later
-- Maven 3.9+
-- PostgreSQL 14+ with pgvector extension
-- Google Gemini API key
-
-## 🚀 Quick Start
-
-### 1. Clone and Setup
-
-```bash
-git clone https://github.com/UnikPrince/Knowledge-Test.git
-cd Knowledge-Test
-
-# Copy environment template
-cp .env.example .env
+```
+┌─────────────────────────────────────────────┐
+│           Frontend (React/Vue)              │
+└────────────────┬────────────────────────────┘
+                 │ HTTP/REST
+┌────────────────▼────────────────────────────┐
+│         API Controllers (Spring)            │
+├─────────────────────────────────────────────┤
+│  InterviewController | ReportController     │
+│  DocumentController  | HealthController     │
+└────────────────┬────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│       Application Services Layer            │
+├─────────────────────────────────────────────┤
+│  InterviewAgent | QuestionGenerator         │
+│  ResponseEvaluator | ConversationManager    │
+└────────────────┬────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│     Infrastructure Services Layer           │
+├─────────────────────────────────────────────┤
+│  RAG Pipeline:                              │
+│  ├─ EmbeddingService (Google AI)            │
+│  ├─ VectorStore (PostgreSQL pgvector)       │
+│  ├─ RagRetriever                            │
+│  └─ PromptEngineer                          │
+│                                             │
+│  PDF Processing:                            │
+│  ├─ PDFExtractor (PDFBox)                   │
+│  ├─ ContentFilter                           │
+│  └─ TextChunker                             │
+└────────────────┬────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│      Data Persistence Layer (JPA)           │
+├─────────────────────────────────────────────┤
+│  PostgreSQL Database with pgvector          │
+│  Tables: Documents, Interviews, Reports     │
+└─────────────────────────────────────────────┘
 ```
 
-### 2. Configure Environment
+## Technology Stack
 
-Edit `.env` with your configuration:
+- **Runtime**: Java 21
+- **Framework**: Spring Boot 3.3.0
+- **ORM**: Hibernate JPA
+- **Database**: PostgreSQL with pgvector
+- **AI/LLM**: Google Generative AI (Gemini)
+- **PDF Processing**: Apache PDFBox
+- **Build**: Maven
+- **Logging**: SLF4J with Logback
+- **Configuration**: Externalized config + .env files
 
-```env
-GOOGLE_API_KEY=your_actual_api_key
-DB_HOST=localhost
-DB_USER=postgres
-DB_PASSWORD=your_db_password
-```
-
-### 3. Setup Database
-
-```bash
-# Create database
-createdb interview_simulator
-
-# Install pgvector extension
-psql interview_simulator -c "CREATE EXTENSION IF NOT EXISTS vector;"
-```
-
-### 4. Build and Run
-
-```bash
-# Build project
-mvn clean install
-
-# Run application
-mvn spring-boot:run
-```
-
-The application will start on `http://localhost:8080/api`
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
 ├── main/
 │   ├── java/com/interview/simulator/
-│   │   ├── config/                 # Configuration classes
+│   │   ├── InterviewSimulatorApplication.java
+│   │   ├── config/
+│   │   │   ├── ApplicationConfig.java
+│   │   │   ├── GoogleAiConfig.java
+│   │   │   ├── DatabaseConfig.java
+│   │   │   └── WebConfig.java
 │   │   ├── domain/
-│   │   │   ├── entities/          # JPA entities
-│   │   │   ├── models/            # Domain models
-│   │   │   └── enums/             # Enumerations
-│   │   ├── application/
-│   │   │   ├── dto/               # Data transfer objects
-│   │   │   ├── services/          # Business logic
-│   │   │   └── events/            # Application events
+│   │   │   └── entities/
+│   │   │       ├── Document.java
+│   │   │       ├── DocumentChunk.java
+│   │   │       ├── InterviewSession.java
+│   │   │       ├── InterviewExchange.java
+│   │   │       └── PerformanceReport.java
 │   │   ├── infrastructure/
-│   │   │   ├── pdf/               # PDF processing
-│   │   │   ├── ai/                # AI/LLM integration
-│   │   │   ├── vector/            # Vector store
-│   │   │   └── persistence/       # Repositories
+│   │   │   ├── persistence/
+│   │   │   │   ├── DocumentRepository.java
+│   │   │   │   ├── DocumentChunkRepository.java
+│   │   │   │   ├── InterviewSessionRepository.java
+│   │   │   │   ├── InterviewExchangeRepository.java
+│   │   │   │   └── PerformanceReportRepository.java
+│   │   │   ├── pdf/
+│   │   │   │   ├── PDFExtractor.java
+│   │   │   │   ├── ContentFilter.java
+│   │   │   │   ├── TextChunker.java
+│   │   │   │   └── PdfProcessingService.java
+│   │   │   └── ai/
+│   │   │       ├── EmbeddingService.java
+│   │   │       ├── VectorStore.java
+│   │   │       ├── RagRetriever.java
+│   │   │       └── PromptEngineer.java
+│   │   ├── application/
+│   │   │   └── services/
+│   │   │       ├── InterviewAgent.java
+│   │   │       ├── QuestionGenerator.java
+│   │   │       ├── ResponseEvaluator.java
+│   │   │       ├── ConversationManager.java
+│   │   │       └── InterviewSessionService.java
 │   │   ├── presentation/
-│   │   │   ├── controllers/       # REST controllers
-│   │   │   └── advice/            # Exception handlers
-│   │   └── InterviewSimulatorApplication.java
+│   │   │   ├── controllers/
+│   │   │   │   ├── InterviewController.java
+│   │   │   │   ├── ReportController.java
+│   │   │   │   ├── DocumentController.java
+│   │   │   │   └── HealthController.java
+│   │   │   ├── dto/
+│   │   │   │   ├── StartInterviewRequest.java
+│   │   │   │   ├── SubmitAnswerRequest.java
+│   │   │   │   ├── InterviewResponse.java
+│   │   │   │   ├── EvaluationResponse.java
+│   │   │   │   └── PerformanceReportDTO.java
+│   │   │   └── exception/
+│   │   │       └── GlobalExceptionHandler.java
 │   └── resources/
-│       └── application.properties  # Spring config
+│       └── application.properties
 └── test/
-    └── java/com/interview/simulator/
 ```
 
-## 🔄 Application Flow
+## Setup Instructions
 
-### Phase 1: PDF Processing
+### Prerequisites
 
-1. User uploads PDF file(s)
-2. Extract text content
-3. Filter technical content (Java, Spring, DevOps, etc.)
-4. Split into chunks with overlap
-5. Store in database
+- Java 21 or higher
+- Maven 3.8+
+- PostgreSQL 14+
+- Google API Key (for Gemini)
 
-### Phase 2: RAG Pipeline
+### 1. Clone Repository
 
-1. Generate embeddings for document chunks
-2. Store vectors in PostgreSQL with pgvector
-3. Create semantic search index
-4. Set up retrieval with similarity threshold
+```bash
+git clone https://github.com/UnikPrince/Knowledge-Test.git
+cd Knowledge-Test
+git checkout develop
+```
 
-### Phase 3: Interview Execution
+### 2. Environment Configuration
 
-1. Initialize interview session
-2. Retrieve relevant context from knowledge base
-3. Generate initial question using RAG
-4. Student provides answer
-5. AI evaluates and asks follow-ups
-6. Adapt difficulty dynamically
-7. Continue for configured question count
+Create `.env` file in project root:
 
-### Phase 4: Performance Evaluation
+```bash
+# Google AI Configuration
+GOOGLE_API_KEY=your_google_api_key_here
+GOOGLE_MODEL_ID=gemini-2.0-flash
 
-1. Analyze all responses
-2. Calculate technical knowledge score
-3. Evaluate communication clarity
-4. Assess problem-solving approach
-5. Generate comprehensive report
-6. Provide study recommendations
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=interview_simulator
+DB_USER=postgres
+DB_PASSWORD=your_password
 
-## 🔌 REST API Endpoints
+# Server Configuration
+SERVER_PORT=8080
+SERVER_SERVLET_CONTEXT_PATH=/api
 
-### PDF Management
-- `POST /api/documents/upload` - Upload PDF file
-- `GET /api/documents` - List uploaded documents
-- `DELETE /api/documents/{id}` - Delete document
+# PDF Processing
+PDF_CHUNK_SIZE=1000
+PDF_CHUNK_OVERLAP=200
+PDF_MAX_FILE_SIZE_MB=50
 
-### Interview Operations
-- `POST /api/interviews/start` - Start new interview session
-- `POST /api/interviews/{sessionId}/answer` - Submit answer to question
-- `GET /api/interviews/{sessionId}` - Get interview session details
-- `POST /api/interviews/{sessionId}/end` - End interview and generate report
-- `GET /api/interviews/{sessionId}/report` - Get performance report
+# RAG Configuration
+RAG_SIMILARITY_THRESHOLD=0.7
+RAG_TOP_K_RESULTS=5
+EMBEDDING_MODEL=textembedding-gecko
 
-### Knowledge Base
-- `GET /api/knowledge/search` - Semantic search with query
-- `GET /api/knowledge/stats` - Knowledge base statistics
+# Interview Configuration
+INTERVIEW_MAX_QUESTIONS=10
+INTERVIEW_DIFFICULTY_ADAPTIVE=true
+INTERVIEW_FOLLOW_UP_ENABLED=true
 
-## 🧠 Core Components
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=logs/app.log
+```
 
-### 1. PDF Processing Module (`infrastructure/pdf`)
+### 3. Database Setup
 
-- `PDFExtractor`: Text extraction from PDFs
-- `ContentFilter`: Filter technical vs. non-technical content
-- `TextChunker`: Split text with configurable overlap
-- `PdfProcessingService`: Orchestrates PDF operations
+```bash
+# Create database
+creatodb interview_simulator
 
-### 2. RAG Module (`infrastructure/ai`)
+# Install pgvector extension
+psql -d interview_simulator -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
 
-- `EmbeddingService`: Generate embeddings using Google API
-- `VectorStore`: PostgreSQL vector storage and retrieval
-- `RagRetriever`: Semantic search and context retrieval
-- `PromptEngineer`: Context-aware prompt construction
+### 4. Build and Run
 
-### 3. Interview Agent (`application/services`)
+```bash
+# Build the project
+mvn clean package
 
-- `InterviewAgent`: Main interviewer logic
-- `ConversationManager`: Track interview state
-- `QuestionGenerator`: Generate adaptive questions
-- `ResponseEvaluator`: Evaluate student answers
+# Run the application
+mvn spring-boot:run
 
-### 4. Evaluation Engine (`application/services`)
+# Or run the JAR directly
+java -jar target/ai-interview-simulator-1.0.0.jar
+```
 
-- `EvaluationService`: Score calculation
-- `ReportGenerator`: Generate performance reports
-- `StudyPlanner`: Recommend study topics
+The application will start at `http://localhost:8080/api`
 
-## ⚙️ Configuration
+## API Endpoints
+
+### Interview Management
+
+#### Start Interview
+```bash
+POST /api/v1/interviews/start
+Content-Type: application/json
+
+{
+  "studentName": "John Doe",
+  "topic": "Spring Boot Microservices",
+  "maxQuestions": 10
+}
+
+Response:
+{
+  "sessionId": "uuid-here",
+  "question": "What are the key benefits of using Spring Boot?",
+  "questionsRemaining": 10,
+  "status": "ACTIVE"
+}
+```
+
+#### Submit Answer
+```bash
+POST /api/v1/interviews/{sessionId}/submit
+Content-Type: application/json
+
+{
+  "answer": "Spring Boot provides rapid development..."
+}
+
+Response:
+{
+  "relevanceScore": 0.85,
+  "clarityScore": 0.80,
+  "completenessScore": 0.75,
+  "answerQuality": "GOOD",
+  "feedback": "Good answer. Consider providing more examples.",
+  "nextQuestion": "Next question available"
+}
+```
+
+#### Get Performance Report
+```bash
+GET /api/v1/reports/{sessionId}
+
+Response:
+{
+  "overallScore": 78.5,
+  "technicalKnowledge": 82.0,
+  "conceptClarity": 75.0,
+  "communicationSkills": 80.0,
+  "confidenceLevel": 75.0,
+  "strengthAreas": "...",
+  "weakAreas": "...",
+  "recommendations": "...",
+  "readinessLevel": 4
+}
+```
+
+### Document Management
+
+#### Upload PDF
+```bash
+POST /api/v1/documents/upload
+Content-Type: multipart/form-data
+
+File: knowledge_base.pdf
+
+Response:
+{
+  "documentId": 1,
+  "fileName": "knowledge_base.pdf",
+  "status": "PROCESSED",
+  "chunks": 42
+}
+```
+
+### Health Check
+```bash
+GET /api/v1/health
+
+Response:
+{
+  "status": "UP",
+  "message": "AI Interview Simulator is running"
+}
+```
+
+## Development Workflow
+
+### Running Tests
+
+```bash
+mvn test
+```
+
+### Code Quality
+
+```bash
+# Run checkstyle
+mvn checkstyle:check
+
+# Run spotbugs
+mvn spotbugs:check
+```
+
+### Logging
+
+Logs are written to `logs/app.log` and console. Configure in `application.properties`:
+
+```properties
+logging.level.com.interview.simulator=DEBUG
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n
+```
+
+## Database Schema
+
+### Documents Table
+```sql
+CREATE TABLE documents (
+    id BIGSERIAL PRIMARY KEY,
+    file_name VARCHAR(255) NOT NULL,
+    file_path TEXT NOT NULL,
+    file_size BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    raw_content TEXT,
+    extracted_content TEXT,
+    total_chunks INT,
+    uploaded_at TIMESTAMP NOT NULL,
+    processed_at TIMESTAMP
+);
+```
+
+### Interview Sessions Table
+```sql
+CREATE TABLE interview_sessions (
+    id BIGSERIAL PRIMARY KEY,
+    session_id VARCHAR(36) UNIQUE NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    interview_topic VARCHAR(255),
+    total_questions INT,
+    questions_asked INT,
+    current_difficulty VARCHAR(20),
+    started_at TIMESTAMP NOT NULL,
+    ended_at TIMESTAMP,
+    notes TEXT,
+    performance_report_id BIGINT
+);
+```
+
+## Configuration
 
 ### Application Properties
 
-Edit `src/main/resources/application.properties`:
+Key configuration parameters in `application.properties`:
 
 ```properties
-# Server
-server.port=8080
-server.servlet.context-path=/api
+# RAG Parameters
+rag.similarity-threshold=0.7  # Min similarity for retrieval
+rag.top-k-results=5           # Top chunks to retrieve
 
-# Google AI
-google.api.key=${GOOGLE_API_KEY}
-google.model.id=${GOOGLE_MODEL_ID}
+# PDF Processing
+pdf.chunk-size=1000           # Characters per chunk
+pdf.chunk-overlap=200         # Overlap between chunks
+pdf.max-file-size-mb=50       # Max file size
 
-# Database
-spring.datasource.url=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-spring.datasource.username=${DB_USER}
-spring.datasource.password=${DB_PASSWORD}
-spring.jpa.hibernate.ddl-auto=update
-
-# PDF
-pdf.chunk-size=${PDF_CHUNK_SIZE:1000}
-pdf.chunk-overlap=${PDF_CHUNK_OVERLAP:200}
-
-# RAG
-rag.similarity-threshold=${RAG_SIMILARITY_THRESHOLD:0.7}
-rag.top-k-results=${RAG_TOP_K_RESULTS:5}
-
-# Interview
-interview.max-questions=${INTERVIEW_MAX_QUESTIONS:10}
-interview.difficulty-adaptive=${INTERVIEW_DIFFICULTY_ADAPTIVE:true}
+# Interview Settings
+interview.max-questions=10           # Default questions
+interview.difficulty-adaptive=true   # Enable difficulty adaptation
+interview.follow-up-enabled=true     # Enable follow-up questions
 ```
 
-## 🧪 Testing
+## Performance Optimization
 
-Run tests with:
+### Vector Search Optimization
 
-```bash
-# All tests
-mvn test
-
-# Specific test class
-mvn test -Dtest=InterviewAgentTest
-
-# With coverage
-mvn test jacoco:report
+```sql
+-- Create index on embeddings for faster similarity search
+CREATE INDEX ON document_chunks USING ivfflat (embedding vector_cosine_ops);
 ```
 
-## 📊 Performance Metrics
+### Database Connection Pooling
 
-- **PDF Processing**: ~1-2 seconds for 10-page document
-- **Embedding Generation**: ~500ms per document (cached)
-- **RAG Retrieval**: ~100-200ms per query
-- **Interview Response**: ~2-5 seconds (LLM dependent)
+HikariCP is configured automatically. Tune in `application.properties`:
 
-## 🔐 Security Considerations
+```properties
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=20000
+```
 
-- ✅ API keys stored in environment variables (never hardcoded)
-- ✅ Input validation on all endpoints
-- ✅ SQL injection prevention via JPA
-- ✅ Rate limiting on API endpoints
-- ✅ CORS configured for trusted origins
-- ✅ Logging excludes sensitive data
+## Deployment
 
-## 🚀 Future Enhancements
+### Docker Build
 
-### Near-term
-- [ ] Voice-based interviews with ADK Voice
-- [ ] Resume parsing and analysis
-- [ ] Company-specific interview modes
-- [ ] Coding challenge integration
+```dockerfile
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+COPY target/ai-interview-simulator-1.0.0.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
 
-### Medium-term
-- [ ] Multi-language support
-- [ ] Multiple interviewer personalities
-- [ ] Real-time performance analytics
-- [ ] Web and mobile clients
+### Docker Compose
 
-### Long-term
-- [ ] Interview session history
-- [ ] User authentication & profiles
-- [ ] Analytics dashboard
-- [ ] Distributed training pipeline
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      DB_HOST: postgres
+    depends_on:
+      - postgres
 
-## 🤝 Contributing
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: interview_simulator
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Commit changes: `git commit -am 'Add feature'`
+volumes:
+  pgdata:
+```
+
+## Contributing
+
+1. Create feature branch: `git checkout -b feature/your-feature`
+2. Commit changes: `git commit -am 'Add new feature'`
 3. Push to branch: `git push origin feature/your-feature`
 4. Submit pull request
 
-## 📝 Code Standards
+## License
 
-- Follow Google Java Style Guide
-- Use Lombok for boilerplate reduction
-- Add unit tests for new features (>80% coverage)
-- Document public APIs with JavaDoc
-- Use meaningful commit messages
+MIT License - see LICENSE file for details
 
-## 📄 License
+## Support
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+For issues and questions:
+- GitHub Issues: [Create Issue](https://github.com/UnikPrince/Knowledge-Test/issues)
+- Email: support@interviewsimulator.dev
 
-## 👨‍💻 Author
+## Roadmap
 
-**UnikPrince**  
-Senior Java Engineer | AI/ML Enthusiast
-
-## 📞 Support & Contact
-
-For issues, questions, or suggestions:
-- 📧 Create an issue on GitHub
-- 💬 Start a discussion
-- 🔗 See the wiki for more documentation
+- [ ] Real-time WebSocket support
+- [ ] Multi-language interview support
+- [ ] Video recording and analysis
+- [ ] Peer comparison analytics
+- [ ] Mobile app (React Native)
+- [ ] Enterprise authentication (OAuth2/SAML)
 
 ---
 
-**Last Updated**: July 2026  
-**Status**: 🚧 In Active Development
+**Developed by**: Prince Pandey  
+**Last Updated**: 2026-07-26  
+**Version**: 1.0.0
